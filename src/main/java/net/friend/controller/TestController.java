@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,9 +27,6 @@ public class TestController {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsername(), loginRequest.getPassword()));
-
-    // If there's no exception, set Security Context with authentication
-    SecurityContextHolder.getContext().setAuthentication(authentication);
 
     // Return jwt to user
     String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
