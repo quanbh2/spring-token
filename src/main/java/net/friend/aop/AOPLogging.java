@@ -47,8 +47,15 @@ public class AOPLogging {
   }
 
   @Pointcut("!@annotation(net.friend.aop.AOPLogging.NoLogging)")
-  private void logEnabled() {}
+  private void logEnabled() {
+      // Method is empty as this is just a Pointcut, the implementations are in the advices.
+  }
 
+    /**
+     *
+     * @param joinPoint
+     * Log info before executing controller
+     */
   @Before("withinControllers() && springBeanPointcut() && logEnabled()")
   public void logBefore(JoinPoint joinPoint) {
 
@@ -63,6 +70,8 @@ public class AOPLogging {
       String requestMethod = request.getMethod();
       String name = request.getUserPrincipal().getName();
       String browser = getDeviceName(request.getHeader("User-Agent"));
+
+      //get user's remote address
       String remoteAddr = "";
       if (request != null) {
         remoteAddr = request.getHeader("X-FORWARDED-FOR");
@@ -70,7 +79,19 @@ public class AOPLogging {
           remoteAddr = request.getRemoteAddr();
         }
       }
-      msgBuilder.append(methodName).append(" START: ").append(requestMethod).append(" - ").append(" username: ").append(name).append(" - device: ").append(browser).append(" - address: ").append(remoteAddr);
+
+      msgBuilder
+          .append(methodName)
+          .append(" START: ")
+          .append(requestMethod)
+          .append(" - ")
+          .append(" username: ")
+          .append(name)
+          .append(" - device: ")
+          .append(browser)
+          .append(" - address: ")
+          .append(remoteAddr);
+
       // get all parameters of method
       Object[] args = joinPoint.getArgs();
       MethodSignature codeSignature = (MethodSignature) joinPoint.getSignature();
@@ -105,43 +126,56 @@ public class AOPLogging {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
   }
 
+    /**
+     *
+     * @param joinPoint
+     * @return
+     */
   private String jointPointName(JoinPoint joinPoint) {
     return joinPoint.getSignature().toShortString();
   }
 
-    public static String getDeviceName(String userAgent) {
-        if (userAgent == null) return "Unidentified";
+    /**
+     *
+     * @param userAgent
+     * Get device name and browser
+     * @return
+     */
+  private String getDeviceName(String userAgent) {
+    if (userAgent == null) return "Unidentified";
 
-        StringBuilder device = new StringBuilder();
+    StringBuilder device = new StringBuilder();
 
-        if (userAgent.contains("Mobi")) device.append("Mobile ");
-        else device.append("PC ");
+    if (userAgent.contains("Mobi")) device.append("Mobile ");
+    else device.append("PC ");
 
-        if (userAgent.contains("Chrome") && !userAgent.contains("Chromium") && !userAgent.contains("FB") && !userAgent.contains("Edge")) device.append("Chrome");
-        else if (userAgent.contains("Safari")
-                && !(userAgent.contains("Chrome") || userAgent.contains("Chromium")))
-            device.append("Safari");
-        else if (userAgent.contains("SamsungBrowser")) device.append("Samsung Browser");
-        else if (userAgent.contains("Firefox") && !userAgent.contains("Seamonkey"))
-            device.append("Firefox");
-        else if (userAgent.contains("Edge")) device.append("Edge");
-        else if (userAgent.contains("OPR") || userAgent.contains("Opera")) device.append("Opera");
-        else if (userAgent.contains("UCBrowser")) device.append("UCBrowser");
-        else if (userAgent.contains("MSIE")) device.append("Internet Explorer IE");
-        else if (userAgent.contains("Seamonkey")) device.append("Seamonkey");
-        else if (userAgent.contains("Chromium")) device.append("Chromium");
-        else if (userAgent.contains("coc_coc_browser")) device.append("Coc Coc");
-        else if (userAgent.contains("Brave")) device.append("Brave");
-        else if (userAgent.contains("iPhone")
-                || userAgent.contains("iPad")
-                || userAgent.contains("iPod")) device.append("Default IOS");
-        else if (userAgent.contains("Android") && !userAgent.contains("Windows Phone"))
-            device.append("Default Android");
-        else device.append("Default Browser Other OS");
+    if (userAgent.contains("Chrome")
+        && !userAgent.contains("Chromium")
+        && !userAgent.contains("FB")
+        && !userAgent.contains("Edge")) device.append("Chrome");
+    else if (userAgent.contains("Safari")
+        && !(userAgent.contains("Chrome") || userAgent.contains("Chromium")))
+      device.append("Safari");
+    else if (userAgent.contains("SamsungBrowser")) device.append("Samsung Browser");
+    else if (userAgent.contains("Firefox") && !userAgent.contains("Seamonkey"))
+      device.append("Firefox");
+    else if (userAgent.contains("Edge")) device.append("Edge");
+    else if (userAgent.contains("OPR") || userAgent.contains("Opera")) device.append("Opera");
+    else if (userAgent.contains("UCBrowser")) device.append("UCBrowser");
+    else if (userAgent.contains("MSIE")) device.append("Internet Explorer IE");
+    else if (userAgent.contains("Seamonkey")) device.append("Seamonkey");
+    else if (userAgent.contains("Chromium")) device.append("Chromium");
+    else if (userAgent.contains("coc_coc_browser")) device.append("Coc Coc");
+    else if (userAgent.contains("Brave")) device.append("Brave");
+    else if (userAgent.contains("iPhone")
+        || userAgent.contains("iPad")
+        || userAgent.contains("iPod")) device.append("Default IOS");
+    else if (userAgent.contains("Android") && !userAgent.contains("Windows Phone"))
+      device.append("Default Android");
+    else device.append("Default Browser Other OS");
 
-        return device.toString();
-    }
+    return device.toString();
+  }
 }
