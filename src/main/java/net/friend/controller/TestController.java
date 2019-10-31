@@ -1,5 +1,6 @@
 package net.friend.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import net.friend.model.CustomUserDetails;
 import net.friend.model.LoginRequest;
 import net.friend.model.LoginResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class TestController {
@@ -20,6 +22,7 @@ public class TestController {
   @Autowired private JwtTokenProvider tokenProvider;
 
   @PostMapping("/login")
+//  @AOPLogging.NoLogging
   public LoginResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
     // Authentication with username and password
@@ -27,6 +30,7 @@ public class TestController {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsername(), loginRequest.getPassword()));
+
 
     // Return jwt to user
     String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
